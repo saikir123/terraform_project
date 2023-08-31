@@ -9,13 +9,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 terraform {
-  # backend "s3" {
-  #   bucket         = "devops-directive-tf-state" # REPLACE WITH YOUR BUCKET NAME
-  #   key            = "03-basics/import-bootstrap/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   dynamodb_table = "terraform-state-locking"
-  #   encrypt        = true
-  # }
+   backend "s3" {
+     bucket         = "my-first-tfstate" #  YOUR BUCKET NAME
+     key            = "remote_state/import-bootstrap/terraform.tfstate"
+     region         = "us-east-1"
+     dynamodb_table = "terraform-state-locking"
+     encrypt        = true
+   }
 required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -34,33 +34,26 @@ provider "aws" {
 # ------------------------------------------------------------------------------
 # CREATE THE S3 BUCKET
 # ------------------------------------------------------------------------------
-
-data "aws_caller_identity" "current" {}
-
-locals {
-  account_id    = data.aws_caller_identity.current.account_id
+resource "aws_s3_bucket" "terraform_state" {
+  bucket        = "my-first-tfstate" # YOUR BUCKET NAME
+  force_destroy = true
 }
 
-resource "aws_s3_bucket" "terraform_state" {
-  # With account id, this S3 bucket names can be *globally* unique.
-  bucket = "${local.account_id}-terraform-states"
-
-  # Enable versioning so we can see the full revision history of our
-  # state files
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "terraform_bucket_versioning" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  # Enable server-side encryption by default
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_crypto_conf" {
+  bucket        = aws_s3_bucket.terraform_state.bucket 
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
-
 # ------------------------------------------------------------------------------
 # CREATE THE DYNAMODB TABLE
 # ------------------------------------------------------------------------------
