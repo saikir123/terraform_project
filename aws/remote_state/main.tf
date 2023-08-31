@@ -11,9 +11,9 @@
 terraform {
    backend "s3" {
      bucket         = "my-first-tfstate" #  YOUR BUCKET NAME
-     key            = "remote_state/import-bootstrap/terraform.tfstate"
+     key            = "remote_state/terraform.tfstate"
      region         = "us-east-1"
-     dynamodb_table = "terraform-state-locking"
+     dynamodb_table = "terraform-lock"
      encrypt        = true
    }
 required_providers {
