@@ -9,13 +9,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 terraform {
-   backend "s3" {
-     bucket         = "my-first-tfstate" #  YOUR BUCKET NAME
-     key            = "remote_state/terraform.tfstate"
-     region         = "us-east-1"
-     dynamodb_table = "terraform-lock"
-     encrypt        = true
-   }
+  # backend "s3" {
+   #  bucket         = "my-first-tfstate" #  YOUR BUCKET NAME
+    # key            = "remote_state/terraform.tfstate"
+     #region         = "us-east-1"
+     #dynamodb_table = "terraform-lock"
+     #encrypt        = true
+   #}
 required_providers {
     aws = {
       source  = "hashicorp/aws"
