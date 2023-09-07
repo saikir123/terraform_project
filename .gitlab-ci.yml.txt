@@ -1,0 +1,16 @@
+before script:
+  - mkdir -p ~/.aws
+  - echo "$(CI_JOB_JWT V2}" > /tmp/web_identity_token
+  - echo -e "[profile oidc]\nrole_arn=${ROLE_ARN}\nweb_identity_token_file=/tmp/web_identity_token" > ~/.aws/config
+
+test-access:
+  image:
+    name: "amazon/aws-cli:latest"
+    entrypoint: [""]
+  variables:
+    AWS REGION: us-east-1
+    AWS PROFILE: kiran
+  script:
+     - aws sts get-caller-identity
+     - aws s3 Ls
+     - aws ec2 describe-instances
